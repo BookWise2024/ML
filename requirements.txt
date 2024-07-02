@@ -1,0 +1,12 @@
+flask
+torch
+transformers
+requests
+beautifulsoup4
+lxml
+pandas
+numpy
+scikit-learn
+scipy
+flask_cors
+Flask
