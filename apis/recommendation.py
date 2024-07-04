@@ -45,11 +45,8 @@ def recommend_random_books():
     - return
       - list : 랜덤 추천 책 10개
     """
-    random_books = (
-        books.sample(n=10)[["isbn13", "cover"]]
-        .set_index("isbn13")
-        .to_dict(orient="index")
-    )
+
+    random_books = books.sample(n=10)[['isbn13','cover']].to_dict(orient='records')
     return random_books
 
 
@@ -107,12 +104,7 @@ def recommend_for_user(user_preferences=None, user_clicks=None):
 
     # 유사도를 기준으로 추천 도서 정렬
     recommended_indices = similarity_scores.argsort()[::-1][:10]
-    recommended_books = (
-        books.iloc[recommended_indices][["isbn13", "cover"]]
-        .set_index("isbn13")
-        .to_dict(orient="index")
-    )
-    recommended_books = recommended_books.to_dict(orient='index')
+    recommended_books = books.iloc[recommended_indices][['isbn13', 'cover']].to_dict(orient='records')
 
     return recommended_books
 
@@ -129,11 +121,7 @@ def recommend_by_category(preferred_categories):
     if filtered_books.empty:
         return recommend_random_books()
     else:
-        recommendations = (
-            filtered_books.sample(n=10)[["isbn13", "cover"]]
-            .set_index("isbn13")
-            .to_dict(orient="index")
-        )
+        recommendations = filtered_books.sample(n=10)[["isbn13", "cover"]].to_dict(orient="records")
         return recommendations
 
 
@@ -153,17 +141,12 @@ def recommend_similar_books(isbn):
 
     # 유사도를 기준으로 추천 도서 정렬
     similar_indices = similarity_scores.argsort()[::-1][1:11]
-    similar_books = (
-        books.iloc[similar_indices][["isbn13", "cover"]]
-        .set_index("isbn13")
-        .to_dict(orient="index")
-    )
-    similar_books = similar_books.to_dict(orient='records')
+    similar_books = books.iloc[similar_indices][["isbn13", "cover"]].to_dict(orient="records")
 
     return similar_books
 
 
-@recommendation_bp.route("/recommendations", methods=["GET"])
+@recommendation_bp.route("/recommendations", methods=["POST"])
 def recommendation():
     """클릭 수 기반 가중치 함수
     - parameter
@@ -174,16 +157,8 @@ def recommendation():
     """
 
     # 사용자 정보 추출
-
-    user_preferences = request.args.getlist("user_preferences")
-    get_user_clicks = request.args.get("user_clicks")
-
-    user_clicks = {}
-    if get_user_clicks:
-        user_clicks_pair = get_user_clicks.split(',')
-        for pair in user_clicks_pair:
-            isbn, count = pair.split(':')
-            user_clicks[isbn] = int(count)
+    user_preferences = request.json.get("user_preferences", [])
+    user_clicks = request.json.get("user_clicks", {})
 
     if user_preferences or user_clicks:
         recommendations = recommend_for_user(user_preferences, user_clicks)

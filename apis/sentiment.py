@@ -8,6 +8,7 @@ from transformers import BertTokenizerFast, BertModel
 from bs4 import BeautifulSoup
 import requests
 import logging
+import re
 
 # from flask_cors import CORS
 # app = Flask(__name__)
@@ -90,17 +91,18 @@ def get_reviews(item_id):
     reviews = []
     try:
         url = f'https://www.aladin.co.kr/ucl/shop/product/ajax/GetCommunityListAjax.aspx?itemId={item_id}&IsAjax=true&pageType=1&sort=1&communitytype=CommentReview&IsOrderer=2&pageCount=500'
-        # logging.debug(f'Fetching URL : {url}')
         res = requests.get(url)
         res.raise_for_status()
         soup = BeautifulSoup(res.text, 'lxml')
         
-        review_elements = soup.find_all('div', {'class':'np_40box_list_cont'})
-        for element in review_elements:
-            review = element.get_text(separator='\n', strip=True)
-            reviews.append(review)
-        
-        # logging.debug(f'Fetching Reviews: {reviews}')
+        review_blocks = soup.find_all("div", {"class": "np_40box_list_cont"})
+
+        for block in review_blocks:
+            review_content_divs = block.find_all("div", class_="np_40box_list_content")
+            if len(review_content_divs) >= 3:
+                review_content = review_content_divs[1].get_text(separator="\n", strip=True)
+                review_content = re.sub(r"\n", " ", review_content)
+                reviews.append(review_content)
         return reviews
     
     except Exception as e:
