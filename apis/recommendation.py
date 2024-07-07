@@ -46,7 +46,7 @@ def recommend_random_books():
       - list : 랜덤 추천 책 10개
     """
 
-    random_books = books.sample(n=10)[['isbn13','cover']].to_dict(orient='records')
+    random_books = books.sample(n=10)[['isbn13','coverURL']].to_dict(orient='records')
     return random_books
 
 
@@ -104,7 +104,7 @@ def recommend_for_user(user_preferences=None, user_clicks=None):
 
     # 유사도를 기준으로 추천 도서 정렬
     recommended_indices = similarity_scores.argsort()[::-1][:10]
-    recommended_books = books.iloc[recommended_indices][['isbn13', 'cover']].to_dict(orient='records')
+    recommended_books = books.iloc[recommended_indices][['isbn13', 'coverURL']].to_dict(orient='records')
 
     return recommended_books
 
@@ -121,7 +121,7 @@ def recommend_by_category(preferred_categories):
     if filtered_books.empty:
         return recommend_random_books()
     else:
-        recommendations = filtered_books.sample(n=10)[["isbn13", "cover"]].to_dict(orient="records")
+        recommendations = filtered_books.sample(n=10)[["isbn13", "coverURL"]].to_dict(orient="records")
         return recommendations
 
 
@@ -141,7 +141,7 @@ def recommend_similar_books(isbn):
 
     # 유사도를 기준으로 추천 도서 정렬
     similar_indices = similarity_scores.argsort()[::-1][1:11]
-    similar_books = books.iloc[similar_indices][["isbn13", "cover"]].to_dict(orient="records")
+    similar_books = books.iloc[similar_indices][["isbn13", "coverURL"]].to_dict(orient="records")
 
     return similar_books
 
@@ -158,7 +158,7 @@ def recommendation():
 
     # 사용자 정보 추출
     user_preferences = request.json.get("user_preferences", [])
-    user_clicks = request.json.get("user_clicks", {})
+    user_clicks = request.json.get("bookClickDtos", {})
 
     if user_preferences or user_clicks:
         recommendations = recommend_for_user(user_preferences, user_clicks)
