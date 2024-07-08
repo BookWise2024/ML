@@ -4,6 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from scipy.sparse import load_npz
 import pandas as pd
 import numpy as np
+import logging
 
 recommendation_bp = Blueprint("recommendation", __name__)
 
@@ -65,12 +66,15 @@ def recommend_for_user(user_preferences=None, user_clicks=None):
         user_preferences = []
     if user_clicks is None:
         user_clicks = {}
+    
+    logging.debug(f"user_preferences: {user_preferences}, \nuser_clicks: {user_clicks}")
 
     # 사용자 정보가 없으면 랜덤 책 추천
     if not user_preferences and not user_clicks:
         return recommend_random_books()
 
     user_preferences = [str(isbn) for isbn in user_preferences]
+
     user_clicks = {
         str(isbn): click_weight(click_count)
         for isbn, click_count in user_clicks.items()
@@ -81,9 +85,12 @@ def recommend_for_user(user_preferences=None, user_clicks=None):
     tfidf_matrix = vectorizer.fit_transform(combined_text)
 
     # 선호책 벡터
-    preference_vector = tfidf_matrix[books["isbn13"].isin(user_preferences)].mean(
+    if user_preferences:
+        preference_vector = tfidf_matrix[books["isbn13"].isin(user_preferences)].mean(
         axis=0
     )
+    else:
+        preference_vector = np.zeros(tfidf_matrix.shape[1])
     preference_vector = np.asarray(preference_vector).ravel()
 
     # 클릭 수 가중치 벡터
