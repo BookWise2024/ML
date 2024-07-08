@@ -41,7 +41,7 @@ def click_weight(click_count):
 # 비로그인 유저 대상 랜덤 책 추천 함수
 def recommend_random_books():
     """랜덤한 책 10개 추천 함수
-    - parameter
+    - parameters
 
     - return
       - list : 랜덤 추천 책 10개
