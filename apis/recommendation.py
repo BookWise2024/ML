@@ -174,7 +174,11 @@ def recommendation():
 @recommendation_bp.route("/wishlist/count", methods=["GET"])
 def category_recommendation():
     preferred_categories = request.args.getlist("preferred_categories")
-    recommendations = recommend_by_category(preferred_categories)
+
+    recommendations = {
+        "first": recommend_by_category(preferred_categories[0]),
+        "second": recommend_by_category(preferred_categories[1])
+    }
 
     return jsonify(recommendations)
 
