@@ -121,12 +121,12 @@ def classify_sentiment(item_id):
     negative_reviews = []
     for review in reviews:
         sentiment, prob = predictor.predict(review)
-        
+
         # if sentiment==1:
         if prob > 0.6:
-            positive_reviews.append((review, prob))
-        else:
             negative_reviews.append((review, prob))
+        else:
+            positive_reviews.append((review, prob))
 
     # 예측 확률 기준으로 상위 3개를 반환함
     positive_reviews = sorted(positive_reviews, key=lambda x: x[1], reverse=True)[:3]
