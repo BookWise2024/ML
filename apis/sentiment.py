@@ -121,8 +121,9 @@ def classify_sentiment(item_id):
     negative_reviews = []
     for review in reviews:
         sentiment, prob = predictor.predict(review)
-
-        if sentiment==1:
+        
+        # if sentiment==1:
+        if prob > 0.6:
             positive_reviews.append((review, prob))
         else:
             negative_reviews.append((review, prob))
