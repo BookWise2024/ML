@@ -176,8 +176,8 @@ def category_recommendation():
     preferred_categories = request.args.getlist("preferred_categories")
 
     recommendations = {
-        "first": recommend_by_category(preferred_categories[0]),
-        "second": recommend_by_category(preferred_categories[1])
+        "first": recommend_by_category(str(preferred_categories[0])),
+        "second": recommend_by_category(str(preferred_categories[1]))
     }
 
     return jsonify(recommendations)
