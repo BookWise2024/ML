@@ -11,11 +11,11 @@ recommendation_bp = Blueprint("recommendation", __name__)
 """
     데이터 설명
     - books                       : 책 데이터(ISBN, description, category 등)
-    - book_embedding_description  : descripton 임베딩 리스트
+    - book_embedding_all          : 책 전체 메타데이터 임베딩 리스트
     - book_embedding_category     : category 임베딩 리스트
 """
 books = pd.read_pickle("data/books.pkl")
-book_embedding_description = load_npz("data/embedding_matrix_description.npz")
+book_embedding_all = load_npz("data/embedding_matrix_all.npz")
 book_embedding_category = load_npz("data/embedding_matrix_category.npz")
 
 
@@ -53,6 +53,7 @@ def recommend_random_books():
 # 로그인 유저 대상 사용자 맞춤 책 추천 함수
 def recommend_for_user(user_preferences=None, user_clicks=None):
     """유저 선호 정보 기반 책 추천 함수
+    - 추천 기준 : category
     - parameter
       - user_preferences : 사용자 선호 책 정보
       - user_clicks : 사용자 클릭 정보
@@ -76,7 +77,7 @@ def recommend_for_user(user_preferences=None, user_clicks=None):
     }
 
     vectorizer = TfidfVectorizer()
-    combined_text = books['description'].apply(str).tolist()
+    combined_text = books['category'].apply(str).tolist()
     tfidf_matrix = vectorizer.fit_transform(combined_text)
 
     # 선호책 벡터
@@ -111,6 +112,7 @@ def recommend_for_user(user_preferences=None, user_clicks=None):
 
 def recommend_by_category(preferred_categories):
     """사용자 선호 카테고리 기반 책 추천 함수
+    - 추천 기준 : category
     - parameter
       - preferred_categories : 사용자 선호 카테고리
 
@@ -127,6 +129,7 @@ def recommend_by_category(preferred_categories):
 
 def recommend_similar_books(isbn):
     """이 책과 유사한 책 추천 함수
+    - 추천 기준 : 책 메타데이터 전체
     - parameter
       - isbn : 책 ISBN
 
@@ -136,7 +139,7 @@ def recommend_similar_books(isbn):
     # 입력 책의 인덱스
     book_index = books[books["isbn13"] == isbn].index[0]
     similarity_scores = cosine_similarity(
-        book_embedding_category[book_index].reshape(1, -1), book_embedding_category
+        book_embedding_category[book_index].reshape(1, -1), book_embedding_all
     ).flatten()
 
     # 유사도를 기준으로 추천 도서 정렬
