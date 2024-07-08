@@ -139,7 +139,7 @@ def recommend_similar_books(isbn):
     # 입력 책의 인덱스
     book_index = books[books["isbn13"] == isbn].index[0]
     similarity_scores = cosine_similarity(
-        book_embedding_category[book_index].reshape(1, -1), book_embedding_all
+        book_embedding_all[book_index].reshape(1, -1), book_embedding_all
     ).flatten()
 
     # 유사도를 기준으로 추천 도서 정렬
