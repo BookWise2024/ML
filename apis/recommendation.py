@@ -110,7 +110,7 @@ def recommend_for_user(user_preferences=None, user_clicks=None):
     return recommended_books
 
 
-def recommend_by_category(preferred_categories):
+def recommend_by_category(preferred_category):
     """사용자 선호 카테고리 기반 책 추천 함수
     - 추천 기준 : category
     - parameter
@@ -119,7 +119,7 @@ def recommend_by_category(preferred_categories):
     - return
       - list : 추천 책 10개
     """
-    filtered_books = books[books["category"].isin(preferred_categories)]
+    filtered_books = books[books["category"] == preferred_category]
     if filtered_books.empty:
         return recommend_random_books()
     else:
